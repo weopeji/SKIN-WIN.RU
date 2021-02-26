@@ -1,0 +1,33 @@
+{
+    "mongoUri": "mongodb://localhost/skin-win",
+    "appPort": 3000,
+    "secure": false,
+    "secret": "we_opeji",
+    "bit_scins_api_key": "cfade1b0-bde7-4a48-bd1d-765a8ae8185f",
+    "jwt": {
+        "secret": "we_opeji",
+        "tokens": {
+            "access": {
+                "type": "access",
+                "expiresIn": "43800m"
+            }
+        }
+    },
+    "identitySecret": "steam",
+    "ownerID": "76561198969630251",
+    "ownerID_BOT": "76561199127264435",
+    "accounts": [
+        {
+            "type": "admin",
+            "username": "i_opeji",
+            "password": "162416Ab162416",
+            "sharedSecret": "7WvCshKZ5A\/XWWuojIDOIG6QlX4="
+        },
+        {
+            "type": "bot",
+            "username": "skin_win_bot",
+            "password": "135315Ab135315",
+            "sharedSecret": "3qq1Wgtb1hrVMRIWu2KwW2K1+8M="
+        }
+    ]
+}
