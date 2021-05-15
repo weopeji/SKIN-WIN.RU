@@ -1,10 +1,10 @@
-var fetch       = null;
-var jwt         = null;
-var secret      = null;
-var io          = null;
-var mongoose    = null;
-var game        = null;
-var Spinner_Game = null;
+var fetch           = null;
+var jwt             = null;
+var secret          = null;
+var io              = null;
+var mongoose        = null;
+var Spinner_Game    = null;
+var User            = null;
 
 module.exports = {
     init:function(initPlagins)
@@ -24,30 +24,12 @@ function privateInit(initPlagins) {
     io              = initPlagins.io;
     mongoose        = initPlagins.mongoose;
     Spinner_Game    = mongoose.model('Spinner_Game');
-
-    
-    game = 
-    {
-        _id: null,
-        status: false,
-        stage: "free",
-        need_start: true,
-        time: {
-            wait: 10,
-            animate: 10,
-            now: 0,
-        },
-        size: {
-            maxPlayers: 5,
-            minPlayers: 2,
-        },
-        players: new Array(),
-    };
+    User            = mongoose.model('User');
 }
 
 var action_linker = {
     "header": header,
-    "User": User,
+    "User": User_get,
     "msg": Msg,
     "inventory": inventory,
     "data_game": data_game,
@@ -57,22 +39,20 @@ var action_linker = {
 
 var privat_index_page = function(socket,data,callback) {
     var action = data.action;
-    if(typeof action_linker[action] != "undefined")     {
+    if(typeof action_linker[action] != "undefined") {
         action_linker[action](socket,data.data,callback,data)   
     } else {
         callback({
-            error:{
+            error: {
                 code:0 //no action
             }
-        })
+        });
     }
 }
 
-function User(socket, data, callback) 
+function User_get(socket, data, callback) 
 {
     var userId = jwt.verify(data.token, secret).userId;
-    console.log(userId);
-    var User = mongoose.model('User');
     User.findOne({ user: userId })
     .then((UserData) => {
         if(!UserData) {callback("error"); return};
@@ -82,6 +62,7 @@ function User(socket, data, callback)
         .then((json) => {
             var client = json.response.players[0];
             callback({
+                "userId": userId,
                 "name": client.personaname,
                 "avatarfull": client.avatarfull,
                 "verification": UserData.verefication,
@@ -126,7 +107,6 @@ function Msg(socket, data, callback)
 function inventory(socket, data, callback) 
 {
     var userId = jwt.verify(data.token, secret).userId;
-    var User = mongoose.model('User');
     User.findOne({ user: userId })
     .then((UserData) => {
         if(!UserData) {callback("error"); return};
@@ -140,172 +120,238 @@ function data_game(socket, data, callback)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 // ========================================================================================
 
-function randomInteger(min, max) {
-    let rand = min - 0.5 + Math.random() * (max - min + 1);
-    return Math.round(rand);
-}
 
-function getAllDataUsers() 
-{
-    var all_users = new Array();
-    game.players.forEach(element => {
-        var money = 0;
-        element.items.forEach(item => {
-            money = money + parseFloat(item.price);
-        });
-        all_users.push({
-            userId: element.userId,
-            money: money,
-        });
-    });
-
-    var all_money = 0;
-    all_users.forEach(element => {
-        all_money = all_money + element.money;
-    });
-
-    var free_data = new Array();
-    all_users.forEach(element => {
-        var deg = (element.money * 100) / all_money;
-        free_data.push({
-            userId: element.userId,
-            money: element.money,
-            deg: Math.ceil(deg),
-        });
-    });
-
-    var blocks = 0;
-    free_data.forEach(element => {
-        blocks = blocks + element.deg;
-    });
-
-    var all_data = {
-        blocks: blocks,
-        users: free_data
-    };
-
-    var needData = new Array();
-
-    for(var i = 0; i < all_data.users.length; i++) {
-        for(var a = 0; a < all_data.users[i].deg; a++) {
-            needData.push(all_data.users[i].userId);
-        }
-    }
-
-    needData = needData.sort(() => Math.random() - 0.5);
-    var winner = randomInteger(0, all_data.blocks);
-
-    return {
-        winner: winner,
-        data: needData
-    };
-}
-
-
-function timer_game() {
-    var seconds = game.time.wait + game.time.animate;
-    var seconds_timer_id = setInterval(function() {
-        seconds --;
-        game.time_now = seconds;
-        if(seconds == game.time.wait) {
-            game.stage = "start";
-            var getWinnerAndData = getAllDataUsers();
-            io.emit('close_game', {
-                winner_data: {
-                    users: getWinnerAndData.data,
-                    winner: getWinnerAndData.winner,
-                },
-                game: game,
-                text: 'Игра закрыта',
-            });
-        }
-        if(seconds < 0) {
-            game = 
-            {
-                _id: null,
-                status: false,
-                stage: "free",
-                need_start: true,
-                time: {
-                    wait: 10,
-                    animate: 10,
-                    now: 0,
-                },
-                size: {
-                    maxPlayers: 5,
-                    minPlayers: 2,
-                },
-                players: new Array(),
-            }
-            io.emit('end_game', {
-                game: game
-            });
-            clearInterval(seconds_timer_id);  
-        }
-    }, 1000);
-}
+var game = {
+    _id: null,
+    status: false,
+    stage: "free",
+    need_start: true,
+    time: {
+        wait: 10,
+        animate: 10,
+        now: 0,
+    },
+    size: {
+        maxPlayers: 5,
+        minPlayers: 2,
+    },
+    players: new Array(),
+};
 
 
 
-function add_player(data, userId) {
-    var add_item = {
-        userId: userId,
-        user: {
-            name: data.user.name,
-            img: data.user.avatarfull,
+
+const SpFun = {
+    user: {
+        getUser: function(userId) {
+            return User.findOne({user: userId});
         },
-        items: data.items,
-    };
-    Spinner_Game.findOneAndUpdate({_id: game._id}, { $push: { players: add_item }});
-    game.players.push(add_item);
+    },
+    game: {
+        removeItemUser: async function(userId, items) {
+            return User.findOneAndUpdate({user: userId}, { $pull: { items: {_id: {$in: items}}}});
+        },
+        new_game: function() {
+            return Spinner_Game.create({
+                date: new Date(),
+                players: game.players,
+                winner_id: null,
+                winner_money: 0,
+            });
+        },
+        add_player: async function(data, userId) {
+            var add_item = {
+                userId: userId,
+                user: {
+                    name: data.user.name,
+                    img: data.user.avatarfull,
+                },
+                items: data.items,
+            };
+            var _idItems = new Array();
+            add_item.items.forEach(element => {
+                _idItems.push(element._id);
+            });  
+            await SpFun.game.removeItemUser(userId, _idItems);
+            game.players.push(add_item);
+            return Spinner_Game.findOneAndUpdate({_id: game._id}, { $push: { players: add_item }});
+        },
+        timer: {
+            randomInteger: function(min, max) {
+                let rand = min - 0.5 + Math.random() * (max - min + 1);
+                return Math.round(rand);
+            },
+            getAllDataUsers: function()
+            {
+                var all_users = new Array();
+                game.players.forEach(element => {
+                    var money = 0;
+                    element.items.forEach(item => {
+                        money = money + parseFloat(item.price);
+                    });
+                    all_users.push({
+                        userId: element.userId,
+                        money: money,
+                    });
+                });
+                var all_money = 0;
+                all_users.forEach(element => {
+                    all_money = all_money + element.money;
+                });
+                var free_data = new Array();
+                all_users.forEach(element => {
+                    var deg = (element.money * 100) / all_money;
+                    free_data.push({
+                        userId: element.userId,
+                        money: element.money,
+                        deg: Math.ceil(deg),
+                    });
+                });
+                var blocks = 0;
+                free_data.forEach(element => {
+                    blocks = blocks + element.deg;
+                });
+                var all_data = {
+                    blocks: blocks,
+                    users: free_data
+                };
+                var needData = new Array();
+                for(var i = 0; i < all_data.users.length; i++) {
+                    for(var a = 0; a < all_data.users[i].deg; a++) {
+                        needData.push(all_data.users[i].userId);
+                    }
+                }
+                needData = needData.sort(() => Math.random() - 0.5);
+                var winner = SpFun.game.timer.randomInteger(0, all_data.blocks);
+                return {
+                    winner: winner,
+                    data: needData
+                };
+            },
+            default: function() {
+                var seconds = game.time.wait + game.time.animate;
+                var seconds_timer_id = setInterval(async function() {
+                    seconds --;
+                    game.time_now = seconds;
+                    if(seconds == game.time.wait) 
+                    {
+                        game.stage = "start";
+                        var getWinnerAndData = SpFun.game.timer.getAllDataUsers();
+                        var _idWinner = getWinnerAndData.data[getWinnerAndData.winner];
+                        await Spinner_Game.updateOne({_id: game._id}, {winner_id: _idWinner});
+                        var allItemsPush = [];
+                        game.players.forEach(element => {
+                            element.items.forEach(elItems => {
+                                allItemsPush.push(elItems);
+                            });
+                        });
+                        await User.updateOne({user: _idWinner}, { $push: {items: {
+                            $each: allItemsPush
+                        }}});
+                        io.emit('close_game', {
+                            winner_data: {
+                                users: getWinnerAndData.data,
+                                winner: getWinnerAndData.winner,
+                                winner_id: _idWinner,
+                            },
+                            game: game,
+                            text: 'Игра закрыта',
+                        });
+                    }
+                    if(seconds < 0) 
+                    {
+                        game = {
+                            _id: null,
+                            status: false,
+                            stage: "free",
+                            need_start: true,
+                            time: {
+                                wait: 10,
+                                animate: 10,
+                                now: 0,
+                            },
+                            size: {
+                                maxPlayers: 5,
+                                minPlayers: 2,
+                            },
+                            players: new Array(),
+                        };
+                        io.emit('end_game', {
+                            game: game
+                        });
+                        clearInterval(seconds_timer_id);  
+                    }
+                }, 1000);
+            }
+        }
+    },
 }
 
-function new_game(cb) {
-    Spinner_Game.create({ 
-        date: new Date(),
-        players: game.players,
-        winner_id: '',
-        winner_money: 0,
-    }).then(data => {
-        cb(data._id);
-    });
-}
-
-function start_game(socket, data, callback)
+async function start_game(socket, data, callback)
 {
-    var userId = jwt.verify(data.token, secret).userId;
+    var error = { type: false };
 
-    var error = {
-        type: false,
-        text: "",
-    };
+    var userId = jwt.verify(data.token, secret).userId;
+    var _User = await SpFun.user.getUser(userId);
 
     // errors ============================================================
-    
-    // game.players.forEach(element => {
-    //     if(element.userId == userId) {
-    //         error = {
-    //             type: true,
-    //             text: "Вы уже сделали ставку!",
-    //         };
-    //     }
-    // });
 
-    if(game.players.length >= 5) {
+    if(!_User) {
         error = {
             type: true,
-            text: "Превышен лимит игроков",
+            text: "Вы заблокированы!",
         };
+    } else {
+        for (const element of data.items) 
+        { 
+            let NeedElement = _User.items.find(item => item._id == element._id);
+            if(typeof NeedElement == "undefined") {
+                error = {
+                    type: true,
+                    text: "У вас нет этого предмета!",
+                };
+            }
+        }
     }
 
-    if(game.stage == "start") 
-    {
-        error = {
-            type: true,
-            text: "Игра уже идет!",
-        };
+    if(game.players) {
+
+        // game.players.forEach(element => {
+        //     if(element.userId == userId) {
+        //         error = {
+        //             type: true,
+        //             text: "Вы уже сделали ставку!",
+        //         };
+        //     }
+        // });
+
+        if(game.players.length >= 5) {
+            error = {
+                type: true,
+                text: "Превышен лимит игроков",
+            };
+        }
+    
+        if(game.stage == "start") 
+        {
+            error = {
+                type: true,
+                text: "Игра уже идет!",
+            };
+        }
     }
 
     if(error.type) {
@@ -319,30 +365,29 @@ function start_game(socket, data, callback)
     // ====================================================================
 
 
-
-
     if(!game.status) 
     {
-        new_game( function(_id) {
-            game.status = true;
-            game.stage = "wait";
-            game._id = _id;
-            add_player(data, userId);
-            io.emit('start_new_game', game);
-        });
+        var _Game = await SpFun.game.new_game();
+        game.status = true;
+        game.stage = "wait";
+        game._id = _Game._id;
+        await SpFun.game.add_player(data, userId);
+        io.emit('start_new_game', game);
     } 
     else if(game.status) 
     {
-        add_player(data, userId);
+        await SpFun.game.add_player(data, userId);
         io.emit('add_player', game);
         if(game.need_start) {
             game.need_start = false;
-            timer_game();
-        }
+            SpFun.game.timer.default();
+        };
     }
 
+    
     callback({
         status: 'ok',
     });
     
+
 }

@@ -104,14 +104,10 @@ app.post('/steam', function (req, res) {
     });
 });
 
-// trade_bot =================================================================================
-
-//require('./pages/trade_bot');
-
-
 
 // Socket IO data ============================================================================
 var components_html     = null;
+var trade_bot           = null;
 
 var documentReadyRequire = function() 
 {
@@ -124,6 +120,9 @@ var documentReadyRequire = function()
             mongoose: mongoose,
         })
     };
+    if(trade_bot == null) {
+        trade_bot = require('./pages/trade_bot');
+    };
 }
 
 
@@ -132,14 +131,6 @@ var components_page = function components_page(socket,data,callback)
     if(components_html)
     {
         components_html.components_page(socket,data,callback);
-    }
-}
-
-var trade_bot_page = function trade_bot_page(socket,data,callback)
-{
-    if(trade_bot_html)
-    {
-        trade_bot_html.trade_bot_page(socket,data,callback);
     }
 }
 

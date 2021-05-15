@@ -75,10 +75,10 @@
                 <div class="index_page_header_left">
                     <span class="logo">Skin<a>WIN</a></span>
                     <div class="socail_buttons_block">
-                        <div class="vk_auth">
+                        <div class="vk_auth vk_auth_href">
                             <svg fill="#000000" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" width="100px" height="100px">    <path d="M19.952,5.672c-1.904-1.531-4.916-1.79-5.044-1.801c-0.201-0.017-0.392,0.097-0.474,0.281 c-0.006,0.012-0.072,0.163-0.145,0.398c1.259,0.212,2.806,0.64,4.206,1.509c0.224,0.139,0.293,0.434,0.154,0.659 c-0.09,0.146-0.247,0.226-0.407,0.226c-0.086,0-0.173-0.023-0.252-0.072C15.584,5.38,12.578,5.305,12,5.305S8.415,5.38,6.011,6.872 c-0.225,0.14-0.519,0.07-0.659-0.154c-0.14-0.225-0.07-0.519,0.154-0.659c1.4-0.868,2.946-1.297,4.206-1.509 c-0.074-0.236-0.14-0.386-0.145-0.398C9.484,3.968,9.294,3.852,9.092,3.872c-0.127,0.01-3.139,0.269-5.069,1.822 C3.015,6.625,1,12.073,1,16.783c0,0.083,0.022,0.165,0.063,0.237c1.391,2.443,5.185,3.083,6.05,3.111c0.005,0,0.01,0,0.015,0 c0.153,0,0.297-0.073,0.387-0.197l0.875-1.202c-2.359-0.61-3.564-1.645-3.634-1.706c-0.198-0.175-0.217-0.477-0.042-0.675 c0.175-0.198,0.476-0.217,0.674-0.043c0.029,0.026,2.248,1.909,6.612,1.909c4.372,0,6.591-1.891,6.613-1.91 c0.198-0.172,0.5-0.154,0.674,0.045c0.174,0.198,0.155,0.499-0.042,0.673c-0.07,0.062-1.275,1.096-3.634,1.706l0.875,1.202 c0.09,0.124,0.234,0.197,0.387,0.197c0.005,0,0.01,0,0.015,0c0.865-0.027,4.659-0.667,6.05-3.111 C22.978,16.947,23,16.866,23,16.783C23,12.073,20.985,6.625,19.952,5.672z M8.891,14.87c-0.924,0-1.674-0.857-1.674-1.913 s0.749-1.913,1.674-1.913s1.674,0.857,1.674,1.913S9.816,14.87,8.891,14.87z M15.109,14.87c-0.924,0-1.674-0.857-1.674-1.913 s0.749-1.913,1.674-1.913c0.924,0,1.674,0.857,1.674,1.913S16.033,14.87,15.109,14.87z"/></svg>
                         </div>
-                        <div class="vk_auth">
+                        <div class="vk_auth discord_auth_href">
                             <svg fill="#000000" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 48 48" width="100px" height="100px"><path d="M45.763,35.202c-1.797-3.234-6.426-7.12-8.337-8.811c-0.523-0.463-0.579-1.264-0.103-1.776 c3.647-3.919,6.564-8.422,7.568-11.143C45.334,12.27,44.417,11,43.125,11l-3.753,0c-1.237,0-1.961,0.444-2.306,1.151 c-3.031,6.211-5.631,8.899-7.451,10.47c-1.019,0.88-2.608,0.151-2.608-1.188c0-2.58,0-5.915,0-8.28 c0-1.147-0.938-2.075-2.095-2.075L18.056,11c-0.863,0-1.356,0.977-0.838,1.662l1.132,1.625c0.426,0.563,0.656,1.248,0.656,1.951 L19,23.556c0,1.273-1.543,1.895-2.459,1.003c-3.099-3.018-5.788-9.181-6.756-12.128C9.505,11.578,8.706,11.002,7.8,11l-3.697-0.009 c-1.387,0-2.401,1.315-2.024,2.639c3.378,11.857,10.309,23.137,22.661,24.36c1.217,0.12,2.267-0.86,2.267-2.073l0-3.846 c0-1.103,0.865-2.051,1.977-2.079c0.039-0.001,0.078-0.001,0.117-0.001c3.267,0,6.926,4.755,8.206,6.979 c0.368,0.64,1.056,1.03,1.8,1.03l4.973,0C45.531,38,46.462,36.461,45.763,35.202z"/></svg>
                         </div>
                     </div>
@@ -120,6 +120,11 @@
 
 
                 <div class="index_page_header_right">
+
+                    <div class="index_page_header_right_left_block">
+                        <span>Профиль</span>
+                    </div>
+
                     <div class="header_user_block" id="${this.steam_block}">
 
                         <div class="user_steam">
@@ -128,13 +133,13 @@
                         </div>
 
                         <div class="user_header_block">
-                            <div class="user_header_block_add_items">
-                                <p>Пополнить</p>
-                            </div>
-                            <div class="verify"></div>
-                            <span>name</span>
-                            <div class="user_header_block_img"></div>
-                            <img src="./assets/css/images/header/close.png" class="user_header_block_close" alt="">                    
+                            <div class="user_header_block_right">
+                                <div class="user_header_auth_block">
+                                    <span>name</span>
+                                    <div class="user_header_block_img"></div>
+                                </div>
+                                <img src="./assets/css/images/header/close.png" class="user_header_block_close" alt=""> 
+                            </div>                   
                         </div>
                     </div>
                 </div>
@@ -157,12 +162,6 @@
                 $('.index_page').addClass('logined');
                 this.$component.find('.user_header_block span').empty().append(page.user.name);
                 this.$component.find('.user_header_block_img').empty().append(`<img src="${page.user.avatarfull}" alt=""></img>`);
-                this.$component.find('.user_header_block_add_items').click( function() {
-                    window.open("https://steamcommunity.com/tradeoffer/new/?partner=1009364523&token=xAiwcmHX", "_blank");
-                });
-                if(page.user.verification) {
-                    this.$component.find('.verify').empty().append(this.verification);
-                }
             } else {
                 this.$component.find('.user_steam').on("click", function() {
                     location.href = './steam.php';
@@ -171,11 +170,12 @@
         }
 
         logo_block() {
-            if(Auth) {
-                
-            } else {
-
-            }
+            this.$component.find('.vk_auth_href').click( function() {
+                location.href = "https://vk.com/skinwinru";
+            });
+            this.$component.find('.discord_auth_href').click( function() {
+                location.href = "https://vk.com/skinwinru";
+            });
         }
 
         async render() {
@@ -248,6 +248,82 @@
                     
                 </div>
             `);
+
+            this.get_items = $(`
+                <div class="add_money">
+                    <div class="add_money_in">
+                        <div class="add_money_block">
+                            <div class="add_money_block_img">
+                                <img src="./assets/css/images/all/logo.png" alt="">
+                            </div>
+                            <div class="add_money_block_text">
+                                <div class="add_money_block_text_in">
+                                    <h1>Полполнить баланс</h1>
+                                    <p>все доступные вещи для пополнения на сайте:</p>
+            
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/steam.png" alt="">
+                                        </div>
+                                        <span>Вещи Steam</span>
+                                    </div>
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/TF2.png" alt="">
+                                        </div>
+                                        <span>Team Fortress 2</span>
+                                    </div>
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/Rust.jpg" alt="">
+                                        </div>
+                                        <span>Rust</span>
+                                    </div>
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/pd2.png" alt="">
+                                        </div>
+                                        <span>Payday 2</span>
+                                    </div>
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/Unturned.png" alt="">
+                                        </div>
+                                        <span>Unturned</span>
+                                    </div>
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/Z1BR.png" alt="">
+                                        </div>
+                                        <span>Z1BR</span>
+                                    </div>
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/depth.jpg" alt="">
+                                        </div>
+                                        <span>Depth</span>
+                                    </div>
+                                    <div class="add_money_box">
+                                        <div class="add_money_box_img">
+                                            <img src="./assets/css/images/logined_block/KF2.png" alt="">
+                                        </div>
+                                        <span>Killing Floor 2</span>
+                                    </div>
+            
+            
+                                    <div class="add_money_block_text_button">
+                                        <span>Пополнить</span>
+                                    </div>
+            
+                                    <div class="add_item_close_button">
+                                        <span>+</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
         }
 
         put_money(money) {
@@ -308,7 +384,7 @@
             });
 
             this.$component.find('.left_block_body_add_button').click( function() {
-                window.open("https://steamcommunity.com/tradeoffer/new/?partner=1009364523&token=xAiwcmHX", "_blank");
+                $('.add_money').fadeIn();
             });
         }
 
@@ -342,6 +418,13 @@
                     location.href = './steam.php';
                 });
             };
+            this.get_items.find('.add_item_close_button').click( function() {
+                $('.add_money').fadeOut();
+            });
+            this.get_items.find('.add_money_block_text_button').click( function() {
+                window.open("https://steamcommunity.com/tradeoffer/new/?partner=1166998707&token=jf29zgZF", "_blank");
+            });
+            $('body').append(this.get_items);
             return this.$component;
         }
 
@@ -687,6 +770,12 @@
                     "left": "-" + need_left_scroll + "px",
                 });
             });
+
+            setTimeout( function() {
+                if(data.winner_id == page.user.userId) {
+                    MyAlert('Ты выиграл!');
+                }
+            }, 5000);
             
         }
 
@@ -793,11 +882,112 @@
             var get_start_content = await this.start_post(start_data);
             if(get_start_content.status) {
                 MyAlert("Cтавка принята!");
+                $('.inventory_block').removeClass('selected');
+                put_items.forEach(element => {
+                    $('.inventory_block[data="'+ element +'"]').fadeOut('fast', function() {
+                        $(this).remove();
+                    });
+                });
+                global.put_items = new Array();
             } else {
                 MyAlert(get_start_content.error);
             }
         }
 
+    }
+
+    class Cabinet {
+        constructor() {
+            this.profil = $(`
+                <div class="profil">
+                    <h1>Мои данные</h1>
+                    <div class="profil_img_block">
+                        <div class="profil_img"></div>
+                    </div>
+                    <div class="profil_text_block">
+                        <div class="profil_text">
+                            <div class="profil_text_div">
+                                <p>Имя: <span>oPEJI</span></p>
+                            </div>
+                            <div class="profil_text_div">
+                                <p>Steam ID: <span>1242356347</span></p>
+                            </div>
+                            <div class="profil_text_div">
+                                <p>Игр сыграно: <span>12</span></p>
+                            </div>
+                            <div class="profil_text_div">
+                                <p>Выигранных игр: <span>12%</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+            this.trade_url = $(`
+                <div class="profil_url">
+                    <input type="text" id="profil_url_input"> <span><img src="./assets/css/images/telegram.svg" alt=""></span>
+                </div>
+            `);
+
+            this.inventory = $(`
+                <div class="profil_inventory">
+                    <div class="profil_inventory_header">
+                        <a>Инвентарь</a>
+                        <div class="profil_inventory_header_buttons">
+                            <div class="profil_inventory_add">
+                                <span>полпонить</span>
+                            </div>
+                            <div class="profil_inventory_out">
+                                <span>вывод</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profil_inventory_body">
+
+                    </div>
+                </div>
+            `);
+        }
+
+        add_inventory() {
+            $('.profil_inventory').find('.profil_inventory_body').empty();
+            page.user.inventory.forEach(element => {
+                var inventory_block = `
+                    <div class="profil_inventory_block" data="${element._id}">
+                        <a_s>${element.market_hash_name}</a_s>
+                        <img src="${element.icon_url}" alt="">
+                        <a_t>${element.price} $</a_t>
+                    </div>
+                `;
+                $('.profil_inventory').find('.profil_inventory_body').append(inventory_block);
+            });
+
+            $('.profil_inventory').find('.profil_inventory_block').click( function() {
+                var _idItem = $(this).attr('data');
+                if(!$(this).hasClass('selected')) {
+                    global.put_global_items.push(_idItem);
+                } else {
+                    global.put_global_items.splice(global.put_items.indexOf(_idItem), 1);
+                }
+                $(this).toggleClass('selected');
+            });
+        }
+
+        async render() {
+            this.profil.find('.profil_img').append(`<img src="${page.user.avatarfull}" alt=""></img>`);
+            $('.cabinet_profil').empty().append(this.profil);
+            $('.cabinet_body_in').empty();
+            $('.cabinet_body_in').append(this.trade_url);
+            $('.cabinet_body_in').append(this.inventory);
+            $('.profil_inventory_add').click( function() {
+                $('.add_money').fadeIn();
+            })
+        }
+
+        start() {
+            this.add_inventory();
+            $('.cabinet').fadeToggle();
+        }
     }
 
     if(!global.Components)
@@ -808,6 +998,7 @@
             Inventory_Block,
             Chat_Block,
             Spinner_Game,
+            Cabinet,
         }
     }
     

@@ -1,3 +1,8 @@
+console.log ( '%c%s', 'color: red; font: 2.2rem/1 Tahoma;', "WARNING" );
+console.log ( '%c%s', 'color: white; font: 0.8rem/1 Tahoma;', "Эта функция предназначена только для" );
+console.log ( '%c%s', 'color: yellow; font: 0.8rem/1 Tahoma;', "РАЗРАБОТЧИКОВ" );
+console.log ( '%c%s', 'color: white; font: 0.8rem/1 Tahoma;', "Если кто-то пообещал бесплатные скины, деньги или любую другую выгоду за копирование чего-либо, он попытается получить доступ к вашей учетной записи, чтобы обмануть вас." );
+
 var imSocket = null;
 
 window.global_data = {

@@ -11,6 +11,7 @@
     global.Auth = false;
     global.page = new Array();
     global.put_items = new Array();
+    global.put_global_items = new Array();
     global.game = new Array();
 
     (() => {
@@ -27,7 +28,7 @@
             });
         }
         imSocket.on('connect', function() {
-            console.log("im Node connected to " + url);
+            console.log("Сервер подключен к: " + url);
             global.loadResources(['./assets/javascript/components.js'], () => {
                 global.loadResources(['./assets/javascript/games/spinner_game.js'], () => {
                     if(global.getCookie('token')) {global.Auth = true} else {global.Auth = false};
@@ -39,11 +40,12 @@
 
     function Main()
     {
-        const DATA = new global.Components.Get_All_Data();
-        const header = new global.Components.Header_Block();
+        const DATA      = new global.Components.Get_All_Data();
+        const header    = new global.Components.Header_Block();
         const inventory = new global.Components.Inventory_Block();
-        const chat = new global.Components.Chat_Block();
-        const spinner = new global.Components.Spinner_Game();
+        const chat      = new global.Components.Chat_Block();
+        const spinner   = new global.Components.Spinner_Game();
+        const Cabinet   = new global.Components.Cabinet();
 
         (async () => {
             if(Auth) {
@@ -55,21 +57,15 @@
                     token: getCookie('token')
                 });
             }
-            console.log('ok');
 
-            global.PostComponents(
-                'header',
-                {},
-                (response) => {
-                    console.log(response);
-                }
-            );
             page.header = await DATA.Header();
+            
             Promise.all([
                 new Promise(resolve => Header(resolve)),
                 new Promise(resolve => Inventory(resolve)), 
                 new Promise(resolve => Chat(resolve)),
                 new Promise(resolve => Spinner_Game(resolve)),
+                new Promise(resolve => Cabinet_page(resolve)),
             ]).then(() => {
                 $('.preloader').css("display", "none");
             });
@@ -78,6 +74,9 @@
         async function Header(resolve) { // HEADER ===========================
             var header_block = await header.render();
             $('.index_page_header_in').empty().append(header_block);
+            $('.index_page_header_right_left_block').click( function() {
+                Cabinet.start();
+            });
             resolve();
         };
 
@@ -160,14 +159,27 @@
                 spinner.start_animation(data.winner_data);
             });
 
-            imSocket.on('end_game', function(data) { // удаление игры =====================
+            imSocket.on('end_game', async function(data) { // удаление игры =====================
                 game = data.game;
                 need_time = true;
                 spinner.render_again();
+                if(Auth) {
+                    page.user.inventory = await DATA.Inventory({
+                        token: getCookie('token')
+                    });
+                    inventory.auth_render();
+                }
             });
 
             resolve();
         };
+
+        async function Cabinet_page(resolve) {
+            if(Auth) {
+                var Cabinet_render = await Cabinet.render();
+            }
+            resolve();
+        }
     }
 
 }(window))

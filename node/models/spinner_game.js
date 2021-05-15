@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 var autoIncrement = require('mongoose-auto-increment');
 
-const UserShema = new mongoose.Schema({
+const Spinner_Game_Shema = new mongoose.Schema({
     date: String,
     players: Array,
     winner_id: String,
@@ -9,5 +9,5 @@ const UserShema = new mongoose.Schema({
 });
 
 autoIncrement.initialize(mongoose.connection);
-UserShema.plugin(autoIncrement.plugin, 'Spinner_Game');
-mongoose.model('Spinner_Game', UserShema);
+Spinner_Game_Shema.plugin(autoIncrement.plugin, 'Spinner_Game');
+mongoose.model('Spinner_Game', Spinner_Game_Shema);

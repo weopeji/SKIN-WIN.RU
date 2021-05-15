@@ -1,3 +1,5 @@
+const fetch = require('node-fetch');
+const Promise = require('bluebird');
 var SteamUser = require('steam-user');
 const mongoose = require('mongoose');
 var	SteamTotp = require('steam-totp');
@@ -6,7 +8,6 @@ var	TradeOfferManager = require('steam-tradeoffer-manager');
 var	config = require('../config.json');
 var	client = new SteamUser();
 var	community = new SteamCommunity();
-const { default: fetch } = require('node-fetch');
 var	manager = new TradeOfferManager ({
 	steam: client,
 	community: community,
@@ -14,21 +15,35 @@ var	manager = new TradeOfferManager ({
 });	
 
 var logOnOptions = {
-	accountName: config.accounts[0].username,
-	password: config.accounts[0].password,
-	twoFactorCode: SteamTotp.generateAuthCode(config.accounts[0].sharedSecret)
+	accountName: config.accounts[1].username,
+	password: config.accounts[1].password,
+	twoFactorCode: SteamTotp.generateAuthCode(config.accounts[1].sharedSecret)
 };
 
-var items = {
-	csgo: require('../items_prices/csgo.json').prices,
-	Depth: require('../items_prices/Depth.json').prices,
-	KillingFloor2: require('../items_prices/KillingFloor2.json').prices,
-	PayDay2: require('../items_prices/PayDay2.json').prices,
-	Rust: require('../items_prices/Rust.json').prices,
-	TeamFortress2: require('../items_prices/TeamFortress2.json').prices,
-	Unturned: require('../items_prices/Unturned.json').prices,
-	Z1BattleRoyale: require('../items_prices/Z1BattleRoyale.json').prices,
-} 
+client.logOn(logOnOptions);
+	client.setOption("promptSteamGuardCode", false);
+	client.on('loggedOn', () => {
+	console.log("Бот в сети!");
+	client.setPersona(SteamUser.EPersonaState.Online);
+	client.gamesPlayed(["SKIN-WIN.RU", 440]);
+});
+
+client.on("friendMessage", function(steamID, message) { // Ответы бота на сообщения
+	if (message == "hi") client.chatMessage(steamID, "Hello, how are you?");
+});
+
+client.on('webSession', (sessionid, cookies) => {
+	manager.setCookies(cookies, function(err) {
+		if (err) {
+			console.log(err);
+			process.exit(1);
+			return;
+		}
+		console.log("Got API key: " + manager.apiKey);
+	});
+	community.setCookies(cookies);
+	community.startConfirmationChecker(20000, config.identitySecret);
+});
 
 const need_games = [
 	{
@@ -58,150 +73,108 @@ const need_games = [
 	{
 		"name": "Z1BattleRoyale",
 		"appId": "433850",
-	},
-	{
-		"name": "csgo",
-		"appId": "730",
 	}
 ];
 
-module.exports = {
-    init:function(initPlagins)
-    {
-        privateInit(initPlagins);
-    },
-    components_page: function(socket,data,callback) {
-        trade_bot_page(socket,data,callback);
-    }
+var Item = mongoose.model('Items');
+
+const MF = {
+	acceptOffer: function(offer) {
+		offer.accept((err) => {
+			community.checkConfirmations();
+			console.log("We Accepted an offer");
+			if (err) console.log("There was an error accepting the offer.");
+		});
+	},
+	declineOffer: function(offer) {
+		offer.decline((err) => {
+			console.log("We Declined an offer");
+			if (err) console.log("There was an error declining the offer.");
+		});
+	},
+	mongoItemPost: function(query) {
+		return Item.findOne(query);
+	},
+	mongoItemCreat: function(query) {
+		return Item.create(query);
+	},
+	fetchPostItem: async function(url) {
+		const res = await fetch(url);
+		const data = await res.json();//assuming data is json
+		return data;
+	},
 }
 
+manager.on('newOffer', processTrade);
 
-client.logOn(logOnOptions);
-	client.setOption("promptSteamGuardCode", false);
-	client.on('loggedOn', () => {
-	console.log("Бот в сети!");
-	client.setPersona(SteamUser.EPersonaState.Online);
-	client.gamesPlayed(["SKIN-WIN.RU", 440]);
-});
+async function processTrade(offer) 
+{
+	var _exitGames 		= ["730", "570"];
+	var offerId 		= offer.partner.getSteamID64();
+	var length_items 	= offer.itemsToReceive.length;
+	var all_items 		= [];
+	var _error 			= false;
 
-client.on("friendMessage", function(steamID, message) { // Ответы бота на сообщения
-	if (message == "hi") {
-		client.chatMessage(steamID, "Hello, how are you?");
-	}
-});
-
-client.on('webSession', (sessionid, cookies) => {
-
-	manager.setCookies(cookies, function(err) {
-
-		if (err) {
-			console.log(err);
-			process.exit(1);
-			return;
-		}
-
-		console.log("Got API key: " + manager.apiKey);
+	offer.itemsToReceive.forEach(element => 
+	{
+		if(_exitGames.indexOf(element.appid) > -1) _error = true;
 	});
-	community.setCookies(cookies);
-	community.startConfirmationChecker(20000, config.identitySecret);
-});
 
-function acceptOffer(offer) {
-	offer.accept((err) => {
-		community.checkConfirmations();
-		console.log("We Accepted an offer");
-		if (err) console.log("There was an error accepting the offer.");
-	});
-}
- 
-function declineOffer(offer) {
-	offer.decline((err) => {
-		console.log("We Declined an offer");
-		if (err) console.log("There was an error declining the offer.");
-	});
-}
+	if(_error) { declineOffer(offer); return; };
 
-
-
-manager.on('newOffer', (offer) => {
-
-	var offerId = offer.partner.getSteamID64();
-
-	var all_items = [];
-
-	console.log("В обмене вещей: " + offer.itemsToReceive.length);
-
-	var error = false;
-
-	offer.itemsToReceive.forEach(element => {
-
-		if(element.appid == "218620" || "232090" || "274940" || "304930" || "440" || "252490" || "433850" || "730")
-		{
-			var needLibrary = null;
-
-			if(element.appid == "218620") needLibrary 			= items.PayDay2;
-			if(element.appid == "232090") needLibrary 			= items.KillingFloor2;
-			if(element.appid == "274940") needLibrary			= items.Depth;
-			if(element.appid == "304930") needLibrary			= items.Unturned;
-			if(element.appid == "440") needLibrary				= items.TeamFortress2;
-			if(element.appid == "252490") needLibrary			= items.Rust;
-			if(element.appid == "433850") needLibrary			= items.Z1BattleRoyale;
-			if(element.appid == "730") needLibrary				= items.csgo;
-
-			var result = needLibrary.filter(function(el){
-				return el.market_hash_name.indexOf(element.market_hash_name) > -1;
+	for (const element of offer.itemsToReceive) {
+		let _item = await MF.mongoItemPost({ app_id: element.appid, market_hash_name: element.market_hash_name });
+		if(!_item) 
+		{ 
+			var _urlSteamId = `https://steamcommunity.com/market/priceoverview/?currency=1&country=us&appid=${element.appid}&market_hash_name=${element.market_hash_name}&format=json`;
+			let _fetch = await MF.fetchPostItem(_urlSteamId);
+			if(!_fetch) { MF.declineOffer(offer); return; };
+			if(!_fetch.success) { MF.declineOffer(offer); return; };
+			if(typeof _fetch.lowest_price == "undefined") { MF.declineOffer(offer); return; };
+			if(parseInt(_fetch.lowest_price.replace(/\D/g, '')) <= 0) { MF.declineOffer(offer); return; };
+			await MF.mongoItemCreat({
+				app_id: element.appid,
+				context_id: element.context_id,
+				market_hash_name: element.market_hash_name,
+				price: parseInt(json.lowest_price.replace(/\D/g, '')),
+				pricing_mode: "market",
+				skewness: null,
+				created_at: null,
+				icon_url: "https://steamcommunity-a.akamaihd.net/economy/image/" + element.icon_url,
+				name_color: element.name_color,
+				quality_color: null,
+				rarity_color: null,
+				instant_sale_price: null
 			});
-
-			var price_item;
-
-			result.forEach(result_element => {
-				if(element.market_hash_name == result_element.market_hash_name) {
-					price_item = result_element.price;
-				}
-			});
-
 			var newId = new mongoose.mongo.ObjectId();
-			
 			var element_full = {
 				_id: newId,
 				app_id: element.appid,
 				market_hash_name: element.market_hash_name,
 				icon_url: "https://steamcommunity-a.akamaihd.net/economy/image/" + element.icon_url,
-				price: price_item,
+				price: parseInt(json.lowest_price.replace(/\D/g, '')),
 			};
-
-			if(element_full.price == undefined) error = true;
-
 			all_items.push(element_full);
-
-		} else {
-			console.log('Вещ не из нужной игры!');
-			error = true;
-		}
-
-	});
-
-	if(error) {
-		declineOffer(offer);
-	} else {
-
-		var endData = {
-			"user": offerId,
-			"items": all_items,
-		}
-
-		var History = mongoose.model('History_Take');
-		var User = mongoose.model('User');
-
-		History.create({ user: offerId, items: all_items});
-		User.findOne({ user: offerId }).then((need_user) => {
-			if(!need_user) {console.log("Error"); return};
-			User.useFindAndUpdate({ user: offerId }, { $push: { items: all_items }}).then(data => {
-				acceptOffer(offer);
-			});
-		});
-		
+		};
+		var newId = new mongoose.mongo.ObjectId();
+		var element_full = {
+			_id: newId,
+			app_id: _item.app_id,
+			market_hash_name: _item.market_hash_name,
+			icon_url: _item.icon_url,
+			price: _item.price,
+		};
+		all_items.push(element_full);
 	}
-
-});
-
+	MF.acceptOffer(offer);
+	var History = mongoose.model('History_Take');
+	var User = mongoose.model('User');
+	History.create({ user: offerId, items: all_items});
+	console.log(offerId);
+	console.log(all_items);
+	User.findOneAndUpdate({ user: offerId }, { $push: { items: {
+		$each: all_items,
+	}}}).then(data => {
+		console.log(data);
+	});
+}

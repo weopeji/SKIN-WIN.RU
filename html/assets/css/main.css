@@ -1,3 +1,8 @@
+@font-face {
+    font-family: MAIN;
+    src: url(./fonts/BILYALAYEREDBASE.ttf);
+}
+
 :root {
     --main-bg-color: #0D164E;
     --main-bg-block-color:#141D5F;
